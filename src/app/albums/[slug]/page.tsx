@@ -19,7 +19,15 @@ export default async function AlbumPage({ params }: AlbumPageProps) {
   const album = getAlbumBySlug(slug);
   if (!album) notFound();
 
-  const images = getAlbumImages(slug);
+  const images =  await getAlbumImages(slug);
+  console.log(
+    images.map((img) => ({
+      file: img.filename,
+      width: img.width,
+      height: img.height,
+      orientation: img.orientation,
+    }))
+  );
 
   return (
     <main className="relative min-h-screen overflow-x-hidden text-white">
@@ -106,21 +114,53 @@ export default async function AlbumPage({ params }: AlbumPageProps) {
               Gallery
             </h2>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Mobile: full-width natural images */}
+            <div className="grid grid-cols-1 gap-4 md:hidden">
               {images.map((image) => (
                 <div
                   key={image.src}
-                  className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-white/10 bg-white/5"
+                  className="overflow-hidden rounded-2xl border border-white/10 bg-white/5"
                 >
                   <Image
                     src={image.src}
                     alt={album.title}
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover transition duration-300 hover:scale-[1.02]"
+                    width={image.width}
+                    height={image.height}
+                    sizes="100vw"
+                    className="h-auto w-full"
                   />
                 </div>
               ))}
+            </div>
+
+            {/* Desktop / tablet: Google Photos–style rows */}
+            <div className="hidden md:flex md:flex-wrap md:gap-4">
+              {images.map((image) => {
+                const aspectRatio = image.width / image.height;
+
+                return (
+                  <div
+                    key={image.src}
+                    className="relative h-65 overflow-hidden rounded-2xl border border-white/10 bg-white/5 lg:h-[280px]"
+                    style={{
+                      flexGrow: aspectRatio,
+                      flexBasis: `${260 * aspectRatio}px`,
+                    }}
+                  >
+                    <Image
+                      src={image.src}
+                      alt={album.title}
+                      fill
+                      sizes={
+                        image.orientation === "landscape"
+                          ? "(max-width: 1024px) 50vw, 40vw"
+                          : "(max-width: 1024px) 30vw, 20vw"
+                      }
+                      className="object-cover transition duration-300 hover:scale-[1.02]"
+                    />
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>

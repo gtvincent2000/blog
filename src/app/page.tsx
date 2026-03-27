@@ -1,7 +1,7 @@
 import Image from "next/image";
-import Link from "next/link";
 import { Playfair_Display } from "next/font/google";
 import YearDropdownList from "../../components/YearDropdownList";
+import AlbumTransitionOverlay from "../../components/AlbumTransitionOverlay";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -109,35 +109,37 @@ export default function Home() {
           <div className="grid gap-6 md:grid-cols-3">
             {featuredAlbums.map((album, index) => (
               <div key={album.slug}>
-                <Link
+                <AlbumTransitionOverlay
                   href={`/albums/${album.slug}`}
-                  className="group block overflow-hidden rounded-3xl border border-white/10 bg-black/30 backdrop-blur-sm transition hover:bg-black/40"
+                  heroImage={album.coverImage}
+                  title={album.title}
                 >
-                  <div className="relative h-72 w-full overflow-hidden">
-                    <Image
-                      src={album.coverImage}
-                      alt={album.title}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      priority={index === 0}
-                      className="object-cover transition duration-500 group-hover:scale-105"
-                    />
-                  </div>
+                  <div className="group block overflow-hidden rounded-3xl border border-white/10 bg-black/30 backdrop-blur-sm transition hover:bg-black/40">
+                    
+                    <div className="relative h-72 w-full overflow-hidden">
+                      <Image
+                        src={album.coverImage}
+                        alt={album.title}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover transition duration-500 group-hover:scale-105"
+                      />
+                    </div>
 
-                  <div className="p-6">
-                    <p className="mb-2 text-sm uppercase tracking-[0.2em] text-white/60">
-                      {album.year}
-                    </p>
-                    <h3
-                      className={`${playfair.className} mb-3 text-2xl font-semibold`}
-                    >
-                      {album.title}
-                    </h3>
-                    <p className="text-sm leading-relaxed text-white/80 sm:text-base">
-                      {album.description}
-                    </p>
+                    <div className="p-6">
+                      <p className="mb-2 text-sm uppercase tracking-[0.2em] text-white/60">
+                        {album.year}
+                      </p>
+                      <h3 className={`${playfair.className} mb-3 text-2xl font-semibold`}>
+                        {album.title}
+                      </h3>
+                      <p className="text-sm leading-relaxed text-white/80 sm:text-base">
+                        {album.description}
+                      </p>
+                    </div>
+
                   </div>
-                </Link>
+                </AlbumTransitionOverlay>
               </div>
             ))}
           </div>

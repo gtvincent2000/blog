@@ -1,20 +1,24 @@
 import fs from "fs";
 import path from "path";
+import sharp from "sharp";
 
 export type AlbumImage = {
   src: string;
   filename: string;
+  width: number;
+  height: number;
+  orientation: "landscape" | "portrait" | "square";
 };
 
 const albumFolderMap: Record<string, string> = {
   "kyoto-days": "kyoto",
   "engagement-in-kyoto": "engagement",
   "bustling-tokyo": "tokyo",
-  "osaka": "osaka",
+  osaka: "osaka",
   "texas-tulips": "texas-tulips",
 };
 
-export function getAlbumImages(slug: string): AlbumImage[] {
+export async function getAlbumImages(slug: string): Promise<AlbumImage[]> {
   const folder = albumFolderMap[slug];
   if (!folder) return [];
 
@@ -27,8 +31,30 @@ export function getAlbumImages(slug: string): AlbumImage[] {
     .filter((file) => /\.(jpg|jpeg|png|webp)$/i.test(file))
     .sort();
 
-  return files.map((file) => ({
-    filename: file,
-    src: `/images/albums/${folder}/${file}`,
-  }));
+  const results = await Promise.all(
+    files.map(async (file) => {
+      const filePath = path.join(absolutePath, file);
+
+      const metadata = await sharp(filePath).metadata();
+
+      // Uses EXIF-aware dimensions when available
+      const width = metadata.autoOrient?.width ?? metadata.width ?? 1000;
+      const height = metadata.autoOrient?.height ?? metadata.height ?? 1000;
+
+      let orientation: "landscape" | "portrait" | "square" = "square";
+
+      if (width > height) orientation = "landscape";
+      else if (height > width) orientation = "portrait";
+
+      return {
+        filename: file,
+        src: `/images/albums/${folder}/${file}`,
+        width,
+        height,
+        orientation,
+      };
+    })
+  );
+
+  return results;
 }

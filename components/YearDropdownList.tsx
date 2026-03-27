@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import { Playfair_Display } from "next/font/google";
+import AlbumTransitionOverlay from "./AlbumTransitionOverlay";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -71,26 +71,31 @@ const yearAlbums: Record<string, Album[]> = {
 
 function AlbumRow({ album }: { album: Album }) {
   return (
-    <Link
+    <AlbumTransitionOverlay
       href={`/albums/${album.slug}`}
-      className="group grid grid-cols-[72px_1fr] items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:bg-white/10"
+      heroImage={album.coverImage}
+      title={album.title}
     >
-      <div className="relative h-18 w-18 overflow-hidden rounded-xl">
-        <Image
-          src={album.coverImage}
-          alt={album.title}
-          fill
-          sizes="72px"
-          className="object-cover transition duration-300 group-hover:scale-105"
-        />
-      </div>
+      <div className="group grid grid-cols-[72px_1fr] items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:bg-white/10">
+        
+        <div className="relative h-18 w-18 overflow-hidden rounded-xl">
+          <Image
+            src={album.coverImage}
+            alt={album.title}
+            fill
+            sizes="72px"
+            className="object-cover transition duration-300 group-hover:scale-105"
+          />
+        </div>
 
-      <div className="flex items-center justify-center text-center">
-        <h4 className="text-base font-medium tracking-wide text-white sm:text-lg">
-          {album.title}
-        </h4>
+        <div className="flex items-center justify-center text-center">
+          <h4 className="text-base font-medium tracking-wide text-white sm:text-lg">
+            {album.title}
+          </h4>
+        </div>
+
       </div>
-    </Link>
+    </AlbumTransitionOverlay>
   );
 }
 
