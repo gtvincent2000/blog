@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
@@ -21,7 +24,7 @@ const yearAlbums: Record<string, Album[]> = {
       title: "Texas Tulips",
       slug: "texas-tulips",
       year: "2026",
-      coverImage: "/images/albums/texas-tulips-cover.jpg",
+      coverImage: "/images/albums/texas-tulips/texas-tulips-cover.jpg",
     },
   ],
   "2025": [
@@ -100,25 +103,40 @@ function YearDropdown({
   albums: Album[];
   defaultOpen?: boolean;
 }) {
+  const [open, setOpen] = useState(defaultOpen);
+
   return (
-    <details
-      open={defaultOpen}
-      className="group overflow-hidden rounded-2xl border border-white/10 bg-black/30 backdrop-blur-sm"
-    >
-      <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-left list-none">
+    <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/30 backdrop-blur-sm">
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        className="flex w-full items-center justify-between px-5 py-4 text-left"
+      >
         <span className={`${playfair.className} text-2xl text-white`}>
           {year}
         </span>
 
-        <ChevronDown className="h-5 w-5 text-white transition-transform duration-300 group-open:rotate-180" />
-      </summary>
+        <ChevronDown
+          className={`h-5 w-5 text-white transition-transform duration-500 ease-in-out ${
+            open ? "rotate-180" : ""
+          }`}
+        />
+      </button>
 
-      <div className="space-y-3 border-t border-white/10 px-4 py-4">
-        {albums.map((album) => (
-          <AlbumRow key={album.slug} album={album} />
-        ))}
+      <div
+        className={`grid transition-all duration-500 ease-in-out ${
+          open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className="space-y-3 border-t border-white/10 px-4 py-4">
+            {albums.map((album) => (
+              <AlbumRow key={album.slug} album={album} />
+            ))}
+          </div>
+        </div>
       </div>
-    </details>
+    </div>
   );
 }
 
@@ -132,7 +150,6 @@ export default function YearDropdownList() {
             key={year}
             year={year}
             albums={albums}
-            defaultOpen={index === 0}
           />
         ))}
     </div>
